@@ -170,3 +170,30 @@ OFPPT – Développement Digital
 ## 📜 Licence
 
 Projet académique réalisé dans le cadre d’un stage.
+
+
+## 📸 Aperçu
+
+### 🔐 Login
+![Login](screenshots/login.png)
+
+### 📊 Dashboard
+![Dashboard](screenshots/dashboard.png)
+
+### 📋 Demandes
+![Demandes](screenshots/demandes.png)
+
+### ➕ Création demande
+![Create Demande](screenshots/create-demande.png)
+
+### 👥 Utilisateurs
+![Users](screenshots/users.png)
+
+### 🩸 Stock
+![Stock](screenshots/stock.png)
+
+### 🕓 Historique
+![Historique](screenshots/historique.png)
+
+### 🏥 Présentation
+![Presentation](screenshots/presentation.png)
