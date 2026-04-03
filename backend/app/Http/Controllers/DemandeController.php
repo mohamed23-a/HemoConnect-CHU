@@ -137,15 +137,14 @@ class DemandeController extends Controller
         $demande = Demande::findOrFail($id);
         $user = $request->user();
 
+        $errorResponse = null;
         if ($user->role !== 'hospital' || $demande->user_id !== $user->id) {
-            return response()->json(['message' => 'Unauthorized'], 403);
+            $errorResponse = response()->json(['message' => 'Unauthorized'], 403);
+        } elseif ($demande->status !== 'pending') {
+            $errorResponse = response()->json(['message' => 'Cannot update demande that has already been processed.'], 400);
         }
 
-        if ($demande->status !== 'pending') {
-            return response()->json([
-                'message' => 'Cannot update demande that has already been processed.',
-            ], 400);
-        }
+        if ($errorResponse) return $errorResponse;
 
         try {
             DB::beginTransaction();
@@ -182,15 +181,14 @@ class DemandeController extends Controller
         $demande = Demande::findOrFail($id);
         $user = $request->user();
 
+        $errorResponse = null;
         if ($user->role !== 'hospital' || $demande->user_id !== $user->id) {
-            return response()->json(['message' => 'Unauthorized'], 403);
+            $errorResponse = response()->json(['message' => 'Unauthorized'], 403);
+        } elseif ($demande->status !== 'pending') {
+            $errorResponse = response()->json(['message' => 'Cannot cancel demande that has already been processed.'], 400);
         }
 
-        if ($demande->status !== 'pending') {
-            return response()->json([
-                'message' => 'Cannot cancel demande that has already been processed.',
-            ], 400);
-        }
+        if ($errorResponse) return $errorResponse;
 
         try {
             DB::beginTransaction();
@@ -227,28 +225,23 @@ class DemandeController extends Controller
         $demande = Demande::findOrFail($id);
         $user = $request->user();
 
+        $errorResponse = null;
         if (! in_array($user->role, ['blood_center', 'admin'])) {
-            return response()->json(['message' => 'Unauthorized'], 403);
+            $errorResponse = response()->json(['message' => 'Unauthorized'], 403);
+        } elseif (! $demande->isPending()) {
+            $errorResponse = response()->json(['message' => 'This demande has already been processed.'], 400);
+        } else {
+            $availability = $this->stockService->checkAvailability($demande->blood_type, $demande->quantity);
+            if (! $availability['available']) {
+                $errorResponse = response()->json([
+                    'message' => $availability['message'],
+                    'available_quantity' => $availability['current_stock'],
+                    'requested_quantity' => $demande->quantity,
+                ], 400);
+            }
         }
 
-        if (! $demande->isPending()) {
-            return response()->json([
-                'message' => 'This demande has already been processed.',
-            ], 400);
-        }
-
-        $availability = $this->stockService->checkAvailability(
-            $demande->blood_type,
-            $demande->quantity
-        );
-
-        if (! $availability['available']) {
-            return response()->json([
-                'message' => $availability['message'],
-                'available_quantity' => $availability['current_stock'],
-                'requested_quantity' => $demande->quantity,
-            ], 400);
-        }
+        if ($errorResponse) return $errorResponse;
 
         DB::beginTransaction();
 
@@ -315,15 +308,14 @@ class DemandeController extends Controller
         $demande = Demande::findOrFail($id);
         $user = $request->user();
 
+        $errorResponse = null;
         if (! in_array($user->role, ['blood_center', 'admin'])) {
-            return response()->json(['message' => 'Unauthorized'], 403);
+            $errorResponse = response()->json(['message' => 'Unauthorized'], 403);
+        } elseif (! $demande->isPending()) {
+            $errorResponse = response()->json(['message' => 'This demande has already been processed.'], 400);
         }
 
-        if (! $demande->isPending()) {
-            return response()->json([
-                'message' => 'This demande has already been processed.',
-            ], 400);
-        }
+        if ($errorResponse) return $errorResponse;
 
         try {
             DB::beginTransaction();
@@ -367,15 +359,14 @@ class DemandeController extends Controller
         $demande = Demande::findOrFail($id);
         $user = $request->user();
 
+        $errorResponse = null;
         if (! in_array($user->role, ['blood_center', 'admin'])) {
-            return response()->json(['message' => 'Unauthorized'], 403);
+            $errorResponse = response()->json(['message' => 'Unauthorized'], 403);
+        } elseif (! $demande->isApproved()) {
+            $errorResponse = response()->json(['message' => 'Only approved demandes can be completed.'], 400);
         }
 
-        if (! $demande->isApproved()) {
-            return response()->json([
-                'message' => 'Only approved demandes can be completed.',
-            ], 400);
-        }
+        if ($errorResponse) return $errorResponse;
 
         try {
             DB::beginTransaction();

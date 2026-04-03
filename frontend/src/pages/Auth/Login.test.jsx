@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import { BrowserRouter } from "react-router-dom";
 import Login from "./Login";
@@ -25,9 +25,6 @@ describe("Login Component", () => {
       </BrowserRouter>,
     );
     expect(screen.getByRole("button")).not.toBeNull();
-    // It should have email and password inputs
-    const inputs = screen.getAllByRole("textbox"); // type="email", type="text"
-    // Password might be type="password" avoiding standard textbox role sometimes
   });
 
   it("submits form when inputs are provided", async () => {

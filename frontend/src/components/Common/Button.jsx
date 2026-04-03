@@ -1,4 +1,5 @@
 import React, { useRef, useCallback } from "react";
+import PropTypes from "prop-types";
 import { motion } from "framer-motion";
 import { buttonTap } from "../../animations/variants";
 import LoadingSpinner from "./LoadingSpinner";
@@ -31,16 +32,16 @@ const Button = ({
   };
 
   // Outline + ghost use CSS vars for dark mode
-  const outlineStyle =
-    variant === "outline"
-      ? {
-          borderColor: "var(--border)",
-          background: "var(--bg-card)",
-          color: "var(--text)",
-        }
-      : variant === "ghost"
-        ? { color: "var(--text-muted)", background: "transparent" }
-        : {};
+  let outlineStyle = {};
+  if (variant === "outline") {
+    outlineStyle = {
+      borderColor: "var(--border)",
+      background: "var(--bg-card)",
+      color: "var(--text)",
+    };
+  } else if (variant === "ghost") {
+    outlineStyle = { color: "var(--text-muted)", background: "transparent" };
+  }
 
   const sizes = {
     sm: "px-3 py-1.5 text-xs gap-1.5",
@@ -91,5 +92,19 @@ const Button = ({
     </motion.button>
   );
 };
+
+Button.propTypes = {
+  children: PropTypes.node.isRequired,
+  type: PropTypes.string,
+  variant: PropTypes.string,
+  size: PropTypes.string,
+  loading: PropTypes.bool,
+  disabled: PropTypes.bool,
+  onClick: PropTypes.func,
+  className: PropTypes.string,
+  icon: PropTypes.elementType,
+};
+
+
 
 export default Button;

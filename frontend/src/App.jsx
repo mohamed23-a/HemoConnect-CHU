@@ -59,18 +59,13 @@ const DashboardRouter = () => {
           <AdminDashboard />
         </AnimatedPage>
       );
-    case "hospital":
-      return (
-        <AnimatedPage>
-          <HospitalDashboard />
-        </AnimatedPage>
-      );
     case "blood_center":
       return (
         <AnimatedPage>
           <BloodCenterDashboard />
         </AnimatedPage>
       );
+    case "hospital":
     default:
       return (
         <AnimatedPage>

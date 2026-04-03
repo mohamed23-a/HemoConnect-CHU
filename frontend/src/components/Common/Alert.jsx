@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import {
   XCircleIcon,
   CheckCircleIcon,
@@ -66,5 +67,13 @@ const Alert = ({ type = "info", message, onClose }) => {
     </div>
   );
 };
+
+Alert.propTypes = {
+  type: PropTypes.oneOf(["success", "error", "warning", "info"]),
+  message: PropTypes.string.isRequired,
+  onClose: PropTypes.func,
+};
+
+
 
 export default Alert;

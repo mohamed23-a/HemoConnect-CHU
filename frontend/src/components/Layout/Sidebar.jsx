@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useTranslation } from "react-i18next";
@@ -142,7 +143,15 @@ export const MobileSidebar = ({ open, onClose, onLogoClick }) => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="sidebar-overlay md:hidden"
+            role="button"
+            tabIndex={0}
             onClick={onClose}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                onClose();
+              }
+            }}
           />
           <motion.div
             initial={{ x: "100%" }}
@@ -257,4 +266,29 @@ const Logo = () => (
 const Sidebar = ({ collapsed, onToggle }) => (
   <DesktopSidebar collapsed={collapsed} onToggle={onToggle} />
 );
+Sidebar.propTypes = {
+  collapsed: PropTypes.bool.isRequired,
+  onToggle: PropTypes.func.isRequired,
+};
+
+DesktopSidebar.propTypes = {
+  collapsed: PropTypes.bool.isRequired,
+  onToggle: PropTypes.func.isRequired,
+  onLogoClick: PropTypes.func,
+};
+
+MobileSidebar.propTypes = {
+  open: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  onLogoClick: PropTypes.func,
+};
+
+SidebarLink.propTypes = {
+  item: PropTypes.object.isRequired,
+  collapsed: PropTypes.bool.isRequired,
+  onNavigate: PropTypes.func,
+};
+
+
+
 export default Sidebar;

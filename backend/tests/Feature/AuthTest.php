@@ -12,7 +12,7 @@ class AuthTest extends TestCase
 
     public function test_user_can_login_with_correct_credentials()
     {
-        $user = User::factory()->create([
+        User::factory()->create([
             'email' => 'test@example.com',
             'password' => bcrypt('password123'),
             'is_active' => true,
@@ -29,7 +29,7 @@ class AuthTest extends TestCase
 
     public function test_inactive_user_cannot_login()
     {
-        $user = User::factory()->create([
+        User::factory()->create([
             'email' => 'test_inactive@example.com',
             'password' => bcrypt('password123'),
             'is_active' => false,

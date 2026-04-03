@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import { motion } from "framer-motion";
 import { TableRowSkeleton } from "./SkeletonLoader";
 import { staggerContainer, staggerItem } from "../../animations/variants";
@@ -99,6 +100,18 @@ const Table = ({
       </table>
     </div>
   );
+};
+
+Table.propTypes = {
+  columns: PropTypes.arrayOf(PropTypes.shape({
+    header: PropTypes.string.isRequired,
+    key: PropTypes.string,
+    render: PropTypes.func
+  })).isRequired,
+  data: PropTypes.array.isRequired,
+  onRowClick: PropTypes.func,
+  loading: PropTypes.bool,
+  skeletonRows: PropTypes.number,
 };
 
 export default Table;

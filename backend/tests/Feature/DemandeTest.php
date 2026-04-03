@@ -16,6 +16,8 @@ class DemandeTest extends TestCase
 
     protected $bloodCenterUser;
 
+    public const PATIENT_NAME = 'John Doe';
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -42,7 +44,7 @@ class DemandeTest extends TestCase
     public function test_hospital_can_create_demande()
     {
         $response = $this->actingAs($this->hospitalUser)->postJson('/api/demandes', [
-            'patient_name' => 'John Doe',
+            'patient_name' => self::PATIENT_NAME,
             'patient_age' => 30,
             'blood_type' => 'O+',
             'quantity' => 2,
@@ -51,15 +53,15 @@ class DemandeTest extends TestCase
         ]);
 
         $response->assertStatus(201)
-            ->assertJsonFragment(['patient_name' => 'John Doe']);
+            ->assertJsonFragment(['patient_name' => self::PATIENT_NAME]);
 
-        $this->assertDatabaseHas('demandes', ['patient_name' => 'John Doe']);
+        $this->assertDatabaseHas('demandes', ['patient_name' => self::PATIENT_NAME]);
     }
 
     public function test_blood_center_cannot_create_demande()
     {
         $response = $this->actingAs($this->bloodCenterUser)->postJson('/api/demandes', [
-            'patient_name' => 'John Doe',
+            'patient_name' => self::PATIENT_NAME,
             'patient_age' => 30,
             'blood_type' => 'O+',
             'quantity' => 2,
