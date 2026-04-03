@@ -1,80 +1,172 @@
-# HemoConnect CHU
+# 🩸 HemoConnect CHU
 
-Application web de gestion des transfusions sanguines développée pour digitaliser la création, le suivi et le traitement des demandes de transfusion entre les centres hospitaliers, le centre du sang et l’administration.
+Plateforme web moderne pour la gestion des transfusions sanguines entre les centres hospitaliers, le centre du sang et l’administration.
 
-## Aperçu du projet
+---
 
-A-Transfusion est une plateforme web moderne conçue pour améliorer la traçabilité, la rapidité et la sécurité dans la gestion des transfusions sanguines.  
-Le système permet de centraliser les demandes, de suivre leur état en temps réel, de gérer le stock sanguin et d’assurer une meilleure coordination entre les différents acteurs.
+## 📌 Description
 
-## Objectifs
+**HemoConnect CHU** est une application web conçue pour digitaliser et optimiser la gestion des demandes de transfusion sanguine.
 
-- Digitaliser la gestion des demandes de transfusion
-- Améliorer la communication entre les centres hospitaliers et le centre du sang
-- Assurer une meilleure traçabilité des opérations
-- Gérer le stock sanguin selon le groupe sanguin et le type de produit
-- Sécuriser l’accès aux données via une gestion des rôles et permissions
+Elle permet de centraliser les informations, améliorer la communication entre les acteurs, et garantir une meilleure traçabilité et sécurité des opérations médicales.
 
-## Acteurs du système
+---
 
-### Centre hospitalier
-- Créer une demande de transfusion
-- Suivre l’état de ses demandes
-- Annuler une demande tant qu’elle n’est pas confirmée
+## 🎯 Objectifs
 
-### Centre du sang
-- Consulter les demandes
-- Traiter les demandes
-- Gérer le stock sanguin
-- Mettre à jour les quantités disponibles
+* Digitaliser la gestion des transfusions sanguines
+* Améliorer la traçabilité des demandes
+* Réduire les délais de traitement
+* Optimiser la gestion du stock sanguin
+* Sécuriser l’accès aux données
 
-### Administrateur principal
-- Gérer les utilisateurs
-- Confirmer, modifier ou supprimer les demandes
-- Consulter les statistiques et l’historique
+---
 
-### Administrateur superviseur
-- Consulter les utilisateurs
-- Suivre les demandes
-- Consulter les statistiques et l’historique
-- Accès en lecture seule
+## 👥 Acteurs du système
 
-## Produits sanguins pris en charge
+### 🏥 Centre hospitalier
 
-- Sang total
-- Plasma
-- Globules rouges
-- Globules blancs
+* Créer une demande
+* Suivre les demandes
+* Annuler une demande non confirmée
 
-## Fonctionnalités principales
+### 🧪 Centre du sang
 
-- Authentification sécurisée
-- Gestion des rôles et permissions
-- Gestion des utilisateurs
-- Création et suivi des demandes
-- Annulation des demandes non confirmées
-- Gestion du stock sanguin
-- Historique des actions
-- Tableau de bord avec statistiques
+* Gérer le stock
+* Traiter les demandes
+* Mettre à jour les quantités
 
-## Technologies utilisées
+### 👨‍💼 Administrateur principal
+
+* Gérer les utilisateurs
+* Confirmer / supprimer les demandes
+* Accès total
+
+### 👁️ Administrateur superviseur
+
+* Consulter uniquement
+* Suivre les activités
+* Accès en lecture seule
+
+---
+
+## 🧬 Produits sanguins
+
+* Sang total
+* Plasma
+* Globules rouges
+* Globules blancs
+
+---
+
+## ⚙️ Fonctionnalités principales
+
+* 🔐 Authentification sécurisée
+* 👥 Gestion des utilisateurs
+* 📋 Gestion des demandes
+* ❌ Annulation avant confirmation
+* 🩸 Gestion du stock sanguin
+* 📊 Tableau de bord
+* 🕓 Historique des actions
+* 🛡️ Gestion des rôles (RBAC)
+
+---
+
+## 🛠️ Technologies utilisées
 
 ### Backend
-- Laravel
-- REST API
-- Sanctum ou JWT
-- MySQL
+
+* Laravel
+* REST API
+* Sanctum / JWT
+* MySQL
 
 ### Frontend
-- React
-- Axios
-- React Router
-- CSS / Tailwind / Bootstrap selon ton choix
 
-## Structure du projet
+* React
+* Axios
+* React Router
+* Tailwind CSS / CSS
+
+---
+
+## 📂 Structure du projet
 
 ```bash
-HemoConnect CHU/
-├── backend/    # Laravel API
-├── frontend/   # React application
+HemoConnect-CHU/
+│
+├── backend/     # Laravel API
+├── frontend/    # React App
 └── README.md
+```
+
+---
+
+## 🚀 Installation
+
+### 1. Cloner le projet
+
+```bash
+git clone https://github.com/mohamed23-a/HemoConnect-CHU.git
+cd HemoConnect-CHU
+```
+
+---
+
+### 2. Backend (Laravel)
+
+```bash
+cd backend
+composer install
+cp .env.example .env
+php artisan key:generate
+```
+
+Configurer la base de données dans `.env`, puis :
+
+```bash
+php artisan migrate
+php artisan serve
+```
+
+---
+
+### 3. Frontend (React)
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+---
+
+## 🛡️ Sécurité
+
+* Authentification sécurisée
+* RBAC (gestion des rôles)
+* Validation des données
+* Protection CSRF
+* Logs des actions
+
+---
+
+## 🔮 Perspectives
+
+* Notifications en temps réel
+* Version mobile
+* Dashboard avancé
+* Intelligence artificielle (prévision du besoin en sang)
+
+---
+
+## 👨‍💻 Auteur
+
+**Mohamed Ajerdan**
+OFPPT – Développement Digital
+
+---
+
+## 📜 Licence
+
+Projet académique réalisé dans le cadre d’un stage.
