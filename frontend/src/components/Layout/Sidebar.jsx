@@ -93,7 +93,10 @@ export const DesktopSidebar = ({ collapsed, onToggle, onLogoClick }) => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
+              role="button"
+              tabIndex={0}
               onClick={onLogoClick}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onLogoClick(); }}
             >
               <Logo />
               <span
@@ -110,7 +113,10 @@ export const DesktopSidebar = ({ collapsed, onToggle, onLogoClick }) => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="flex justify-center cursor-pointer hover:opacity-80 transition-opacity"
+              role="button"
+              tabIndex={0}
               onClick={onLogoClick}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onLogoClick(); }}
             >
               <Logo />
             </motion.div>
@@ -170,7 +176,10 @@ export const MobileSidebar = ({ open, onClose, onLogoClick }) => {
             >
               <div
                 className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
+                role="button"
+                tabIndex={0}
                 onClick={onLogoClick}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onLogoClick(); }}
               >
                 <Logo />
                 <span

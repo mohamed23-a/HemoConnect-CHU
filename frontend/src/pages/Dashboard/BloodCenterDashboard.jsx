@@ -16,20 +16,9 @@ import {
   ExclamationTriangleIcon,
   ArrowPathIcon,
 } from "@heroicons/react/24/outline";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-} from "recharts";
+import ChartsPanel from "../../components/Dashboard/ChartsPanel";
 
-const COLORS = ["#f59e0b", "#10b981", "#ef4444", "#3b82f6"];
+
 
 const StatCard = ({ title, value, icon: Icon, colorClass }) => (
   <motion.div
@@ -185,62 +174,11 @@ const BloodCenterDashboard = () => {
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        <Card title={t("stats.by_status")}>
-          <ResponsiveContainer width="100%" height={260}>
-            <PieChart>
-              <Pie
-                data={pieData}
-                cx="50%"
-                cy="50%"
-                outerRadius={90}
-                innerRadius={40}
-                dataKey="value"
-                label={({ name, percent }) =>
-                  `${name} ${(percent * 100).toFixed(0)}%`
-                }
-              >
-                {pieData.map((_, i) => (
-                  <Cell key={i} fill={COLORS[i % COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip
-                contentStyle={{
-                  background: "var(--bg-card)",
-                  border: "1px solid var(--border)",
-                  borderRadius: 8,
-                  color: "var(--text)",
-                }}
-              />
-            </PieChart>
-          </ResponsiveContainer>
-        </Card>
-
-        <Card title={t("stats.by_blood_type")}>
-          <ResponsiveContainer width="100%" height={260}>
-            <BarChart
-              data={stats?.demandes_by_blood_type || []}
-              margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-              <XAxis
-                dataKey="blood_type"
-                tick={{ fontSize: 12, fill: "var(--text-muted)" }}
-              />
-              <YAxis tick={{ fontSize: 12, fill: "var(--text-muted)" }} />
-              <Tooltip
-                contentStyle={{
-                  background: "var(--bg-card)",
-                  border: "1px solid var(--border)",
-                  borderRadius: 8,
-                  color: "var(--text)",
-                }}
-              />
-              <Bar dataKey="count" fill="#ef4444" radius={[4, 4, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </Card>
-      </div>
+      <ChartsPanel
+        pieData={pieData}
+        barData={stats?.demandes_by_blood_type}
+        barColor="#ef4444"
+      />
 
       {/* Blood stock */}
       <Card title={t("stock.title")}>

@@ -149,9 +149,17 @@ const NotificationBell = () => {
                 notifications.map((n, i) => (
                   <div
                     key={n.id || i}
+                    role="button"
+                    tabIndex={0}
                     onClick={() => {
                       if (!n.read) markAsRead(n.id);
                       setOpen(false);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        if (!n.read) markAsRead(n.id);
+                        setOpen(false);
+                      }
                     }}
                     className="flex items-start gap-3 px-5 py-3.5 border-b cursor-pointer transition-colors"
                     style={{
@@ -169,22 +177,10 @@ const NotificationBell = () => {
                         : "transparent")
                     }
                   >
-                    <span
-                      className="text-xl mt-0.5"
-                      onClick={() => {
-                        if (!n.read) markAsRead(n.id);
-                        setOpen(false);
-                      }}
-                    >
+                    <span className="text-xl mt-0.5">
                       {typeIcon[n.action] || "🔔"}
                     </span>
-                    <div
-                      className="flex-1 min-w-0"
-                      onClick={() => {
-                        if (!n.read) markAsRead(n.id);
-                        setOpen(false);
-                      }}
-                    >
+                    <div className="flex-1 min-w-0">
                       <p
                         className="text-sm leading-snug"
                         style={{ color: "var(--text)" }}

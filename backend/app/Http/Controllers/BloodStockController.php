@@ -12,6 +12,15 @@ use Illuminate\Support\Facades\Log;
 
 class BloodStockController extends Controller
 {
+    private function returnError(\Exception $e, string $message)
+    {
+        DB::rollBack();
+        Log::error($message . ': ' . $e->getMessage(), ['exception' => $e]);
+        return response()->json([
+            'message' => 'An error occurred while processing blood stock.',
+            'error' => config('app.debug') ? $e->getMessage() : null
+        ], 500);
+    }
     /**
      * Display a listing of blood stock.
      */
@@ -88,12 +97,7 @@ class BloodStockController extends Controller
                 'data' => new BloodStockResource($stock),
             ]);
         } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Error updating blood stock: '.$e->getMessage(), ['exception' => $e]);
-
-            return response()->json([
-                'message' => 'An error occurred while updating blood stock.',
-            ], 500);
+            return $this->returnError($e, 'Error updating blood stock');
         }
     }
 
@@ -134,12 +138,7 @@ class BloodStockController extends Controller
                 'data' => new BloodStockResource($stock),
             ]);
         } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Error adding blood stock: '.$e->getMessage(), ['exception' => $e]);
-
-            return response()->json([
-                'message' => 'An error occurred while adding blood stock.',
-            ], 500);
+            return $this->returnError($e, 'Error adding blood stock');
         }
     }
 
@@ -181,12 +180,7 @@ class BloodStockController extends Controller
                 'data' => new BloodStockResource($stock),
             ]);
         } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Error deducting blood stock: '.$e->getMessage(), ['exception' => $e]);
-
-            return response()->json([
-                'message' => 'An error occurred while deducting blood stock.',
-            ], 500);
+            return $this->returnError($e, 'Error deducting blood stock');
         }
     }
 }

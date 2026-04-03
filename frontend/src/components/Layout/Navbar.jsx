@@ -115,7 +115,10 @@ const Navbar = ({ onMobileMenuToggle, onLogoClick }) => {
 
             <div
               className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
+              role="button"
+              tabIndex={0}
               onClick={onLogoClick}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onLogoClick(); }}
               title="À propos / About HemoConnect CHU"
             >
               <img
