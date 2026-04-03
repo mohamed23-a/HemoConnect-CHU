@@ -11,7 +11,6 @@ import toast from "react-hot-toast";
 import {
   PencilIcon,
   TrashIcon,
-  UserCircleIcon,
   PlusCircleIcon,
   ArrowPathIcon,
 } from "@heroicons/react/24/outline";
@@ -115,7 +114,7 @@ const UserManagement = () => {
       toast.error(t("users.cant_delete_self"));
       return;
     }
-    if (!window.confirm(`${t("users.confirm_delete")} ${user.name}?`)) return;
+    if (!globalThis.confirm(`${t("users.confirm_delete")} ${user.name}?`)) return;
     setProcessing(true);
     try {
       await userService.deleteUser(user.id);
@@ -171,6 +170,7 @@ const UserManagement = () => {
       });
       setActivityData(r.data?.data || r.data || []);
     } catch (e) {
+      console.error(e);
       toast.error(t("errors.load_failed"));
     } finally {
       setLoadingActivity(false);

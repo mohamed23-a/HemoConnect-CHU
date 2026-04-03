@@ -42,6 +42,12 @@ const Statistiques = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const renderStockStatus = (item) => {
+    if (item.quantity === 0) return <span className="badge badge-red">{t("stock.empty")}</span>;
+    if (item.quantity <= (item.minimum_threshold || 5)) return <span className="badge badge-yellow">{t("stock.low")}</span>;
+    return <span className="badge badge-green">{t("stock.available")}</span>;
+  };
+
   useEffect(() => {
     const fetchStats = async () => {
       try {
@@ -144,19 +150,7 @@ const Statistiques = () => {
                         </span>
                       </td>
                       <td className="t-td">
-                        {item.quantity === 0 ? (
-                          <span className="badge badge-red">
-                            {t("stock.empty")}
-                          </span>
-                        ) : item.quantity <= (item.minimum_threshold || 5) ? (
-                          <span className="badge badge-yellow">
-                            {t("stock.low")}
-                          </span>
-                        ) : (
-                          <span className="badge badge-green">
-                            {t("stock.available")}
-                          </span>
-                        )}
+                        {renderStockStatus(item)}
                       </td>
                     </tr>
                   ))}

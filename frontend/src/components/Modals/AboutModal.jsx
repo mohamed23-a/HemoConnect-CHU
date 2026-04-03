@@ -73,7 +73,7 @@ const AboutModal = ({ isOpen, onClose }) => {
               },
             ].map((f, i) => (
               <div
-                key={i}
+                key={`feature-${i}`}
                 className="flex items-start gap-2.5 p-3 rounded-xl border bg-gray-50 lg:bg-white dark:bg-gray-800/50 dark:border-gray-700"
               >
                 <f.icon className={`w-5 h-5 flex-shrink-0 ${f.color}`} />

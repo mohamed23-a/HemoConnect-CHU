@@ -144,7 +144,9 @@ class DemandeController extends Controller
             $errorResponse = response()->json(['message' => 'Cannot update demande that has already been processed.'], 400);
         }
 
-        if ($errorResponse) return $errorResponse;
+        if ($errorResponse) {
+            return $errorResponse;
+        }
 
         try {
             DB::beginTransaction();
@@ -188,7 +190,9 @@ class DemandeController extends Controller
             $errorResponse = response()->json(['message' => 'Cannot cancel demande that has already been processed.'], 400);
         }
 
-        if ($errorResponse) return $errorResponse;
+        if ($errorResponse) {
+            return $errorResponse;
+        }
 
         try {
             DB::beginTransaction();
@@ -241,7 +245,9 @@ class DemandeController extends Controller
             }
         }
 
-        if ($errorResponse) return $errorResponse;
+        if ($errorResponse) {
+            return $errorResponse;
+        }
 
         DB::beginTransaction();
 
@@ -315,7 +321,9 @@ class DemandeController extends Controller
             $errorResponse = response()->json(['message' => 'This demande has already been processed.'], 400);
         }
 
-        if ($errorResponse) return $errorResponse;
+        if ($errorResponse) {
+            return $errorResponse;
+        }
 
         try {
             DB::beginTransaction();
@@ -366,7 +374,9 @@ class DemandeController extends Controller
             $errorResponse = response()->json(['message' => 'Only approved demandes can be completed.'], 400);
         }
 
-        if ($errorResponse) return $errorResponse;
+        if ($errorResponse) {
+            return $errorResponse;
+        }
 
         try {
             DB::beginTransaction();

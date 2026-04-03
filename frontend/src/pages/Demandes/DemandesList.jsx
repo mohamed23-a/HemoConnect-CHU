@@ -13,7 +13,6 @@ import {
   EyeIcon,
   CheckCircleIcon,
   XCircleIcon,
-  ArrowPathIcon,
   PencilSquareIcon,
   NoSymbolIcon,
 } from "@heroicons/react/24/outline";
@@ -26,9 +25,9 @@ const DemandesList = () => {
   const [demandes, setDemandes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({ status: "", blood_type: "" });
-  const [selectedDemande, setSelected] = useState(null);
-  const [showRejectModal, setReject] = useState(false);
-  const [rejectReason, setReason] = useState("");
+  const [selectedDemande, setSelectedDemande] = useState(null);
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [rejectReason, setRejectReason] = useState("");
   const [processing, setProcessing] = useState(false);
 
   useEffect(() => {
@@ -52,7 +51,7 @@ const DemandesList = () => {
 
   const handleApprove = async (demande) => {
     if (
-      !window.confirm(
+      !globalThis.confirm(
         `${t("demandes.confirm_approve")} ${demande.patient_name}?`,
       )
     )
@@ -88,9 +87,9 @@ const DemandesList = () => {
     try {
       await demandeService.rejectDemande(selectedDemande.id, rejectReason);
       toast.success(t("demandes.rejected_ok"));
-      setReject(false);
-      setReason("");
-      setSelected(null);
+      setShowRejectModal(false);
+      setRejectReason("");
+      setSelectedDemande(null);
       fetchDemandes();
     } catch (e) {
       toast.error(e.response?.data?.message || t("errors.generic"));
@@ -101,7 +100,7 @@ const DemandesList = () => {
 
   const handleCancel = async (demande) => {
     if (
-      !window.confirm(
+      !globalThis.confirm(
         t("demandes.confirm_cancel") ||
           "Are you sure you want to cancel this request?",
       )
@@ -279,8 +278,8 @@ const DemandesList = () => {
                               </button>
                               <button
                                 onClick={() => {
-                                  setSelected(d);
-                                  setReject(true);
+                                  setSelectedDemande(d);
+                                  setShowRejectModal(true);
                                 }}
                                 disabled={processing}
                                 className="p-1.5 rounded-lg text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
@@ -337,9 +336,9 @@ const DemandesList = () => {
       <Modal
         isOpen={showRejectModal}
         onClose={() => {
-          setReject(false);
-          setReason("");
-          setSelected(null);
+          setShowRejectModal(false);
+          setRejectReason("");
+          setSelectedDemande(null);
         }}
         title={t("demandes.reject_title")}
       >
@@ -354,7 +353,7 @@ const DemandesList = () => {
               className="th-input"
               rows={3}
               value={rejectReason}
-              onChange={(e) => setReason(e.target.value)}
+              onChange={(e) => setRejectReason(e.target.value)}
               placeholder={t("demandes.reject_reason_placeholder")}
             />
           </div>
@@ -362,9 +361,9 @@ const DemandesList = () => {
             <Button
               variant="outline"
               onClick={() => {
-                setReject(false);
-                setReason("");
-                setSelected(null);
+                setShowRejectModal(false);
+                setRejectReason("");
+                setSelectedDemande(null);
               }}
             >
               {t("common.cancel")}

@@ -23,7 +23,7 @@ export const StatCardSkeleton = () => (
 export const TableRowSkeleton = ({ cols = 5 }) => (
   <tr>
     {Array.from({ length: cols }).map((_, i) => (
-      <td key={i} className="px-6 py-4">
+      <td key={`skeleton-col-${i}`} className="px-6 py-4">
         <Skeleton className="h-4 w-full" />
       </td>
     ))}
@@ -42,7 +42,7 @@ export const CardSkeleton = ({ lines = 3 }) => (
     >
       {Array.from({ length: lines }).map((_, i) => (
         <Skeleton
-          key={i}
+          key={`skeleton-line-${i}`}
           className={`h-4 ${i === lines - 1 ? "w-2/3" : "w-full"}`}
         />
       ))}

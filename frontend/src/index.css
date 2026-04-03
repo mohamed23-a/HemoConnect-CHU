@@ -365,19 +365,19 @@ body {
 }
 .badge-green {
   background: rgba(16, 185, 129, 0.13);
-  color: #059669;
+  color: #047857;
 }
 .badge-yellow {
   background: rgba(245, 158, 11, 0.13);
-  color: #b45309;
+  color: #92400e;
 }
 .badge-red {
   background: rgba(239, 68, 68, 0.13);
-  color: #dc2626;
+  color: #b91c1c;
 }
 .badge-blue {
   background: rgba(59, 130, 246, 0.13);
-  color: #2563eb;
+  color: #1d4ed8;
 }
 .badge-gray {
   background: var(--bg-muted);

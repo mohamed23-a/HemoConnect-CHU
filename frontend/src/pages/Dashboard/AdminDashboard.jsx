@@ -206,8 +206,8 @@ const AdminDashboard = () => {
       {/* Stat Cards */}
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-          {[...Array(4)].map((_, i) => (
-            <StatCardSkeleton key={i} />
+          {[...new Array(4)].map((_, i) => (
+            <StatCardSkeleton key={`admin-stat-${i}`} />
           ))}
         </div>
       ) : error ? (
@@ -455,7 +455,7 @@ const AdminDashboard = () => {
             >
               {stats.recent_activities.slice(0, 10).map((a, idx) => (
                 <motion.div
-                  key={idx}
+                  key={a.id || `activity-${idx}`}
                   variants={staggerItem}
                   className="flex items-start gap-3 py-3 border-b last:border-0"
                   style={{ borderColor: "var(--border)" }}

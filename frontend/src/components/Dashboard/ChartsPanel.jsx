@@ -37,7 +37,7 @@ const ChartsPanel = ({ pieData, barData, barColor = "#3b82f6" }) => {
               }
             >
               {pieData.map((_, i) => (
-                <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                <Cell key={`cell-${i}`} fill={COLORS[i % COLORS.length]} />
               ))}
             </Pie>
             <Tooltip

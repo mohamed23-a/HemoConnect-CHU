@@ -19,7 +19,7 @@ const StockManagement = () => {
   const { t } = useTranslation();
   const [stock, setStock] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedStock, setSelected] = useState(null);
+  const [selectedStock, setSelectedStock] = useState(null);
   const [showAdd, setShowAdd] = useState(false);
   const [showDeduct, setShowDeduct] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
@@ -60,7 +60,7 @@ const StockManagement = () => {
       );
       setShowAdd(false);
       setQuantity(1);
-      setSelected(null);
+      setSelectedStock(null);
       fetchStock();
     } catch (e) {
       toast.error(e.response?.data?.message || t("errors.generic"));
@@ -90,7 +90,7 @@ const StockManagement = () => {
       );
       setShowDeduct(false);
       setQuantity(1);
-      setSelected(null);
+      setSelectedStock(null);
       fetchStock();
     } catch (e) {
       toast.error(e.response?.data?.message || t("errors.generic"));
@@ -114,7 +114,7 @@ const StockManagement = () => {
       setShowEdit(false);
       setQuantity(1);
       setThreshold(5);
-      setSelected(null);
+      setSelectedStock(null);
       fetchStock();
     } catch (e) {
       toast.error(e.response?.data?.message || t("errors.generic"));
@@ -129,6 +129,12 @@ const StockManagement = () => {
     if (item.is_low)
       return <span className="badge badge-yellow">{t("stock.low")}</span>;
     return <span className="badge badge-green">{t("stock.available")}</span>;
+  };
+
+  const getQuantityColor = (item) => {
+    if (item.quantity === 0) return "text-red-500";
+    if (item.is_low) return "text-amber-500";
+    return "text-emerald-500";
   };
 
   const canManageStock = !(
@@ -177,7 +183,7 @@ const StockManagement = () => {
                   <td className="t-td font-semibold">{item.blood_type}</td>
                   <td className="t-td">
                     <span
-                      className={`font-bold text-base ${item.quantity === 0 ? "text-red-500" : item.is_low ? "text-amber-500" : "text-emerald-500"}`}
+                      className={`font-bold text-base ${getQuantityColor(item)}`}
                     >
                       {item.quantity}
                     </span>
@@ -194,7 +200,7 @@ const StockManagement = () => {
                       <div className="flex items-center gap-1.5">
                         <button
                           onClick={() => {
-                            setSelected(item);
+                            setSelectedStock(item);
                             setQuantity(1);
                             setShowAdd(true);
                           }}
@@ -205,7 +211,7 @@ const StockManagement = () => {
                         </button>
                         <button
                           onClick={() => {
-                            setSelected(item);
+                            setSelectedStock(item);
                             setQuantity(1);
                             setShowDeduct(true);
                           }}
@@ -216,7 +222,7 @@ const StockManagement = () => {
                         </button>
                         <button
                           onClick={() => {
-                            setSelected(item);
+                            setSelectedStock(item);
                             setQuantity(item.quantity);
                             setThreshold(item.minimum_threshold);
                             setShowEdit(true);
@@ -264,7 +270,7 @@ const StockManagement = () => {
                 className="th-input"
                 value={quantity}
                 min="1"
-                onChange={(e) => setQuantity(parseInt(e.target.value) || 0)}
+                onChange={(e) => setQuantity(Number.parseInt(e.target.value) || 0)}
               />
               <p
                 className="text-xs mt-1.5"
@@ -304,7 +310,7 @@ const StockManagement = () => {
               className="th-input"
               value={quantity}
               min="0"
-              onChange={(e) => setQuantity(parseInt(e.target.value) || 0)}
+              onChange={(e) => setQuantity(Number.parseInt(e.target.value) || 0)}
             />
           </div>
           <div>
@@ -314,7 +320,7 @@ const StockManagement = () => {
               className="th-input"
               value={threshold}
               min="1"
-              onChange={(e) => setThreshold(parseInt(e.target.value) || 0)}
+              onChange={(e) => setThreshold(Number.parseInt(e.target.value) || 0)}
             />
           </div>
           <div className="flex justify-end gap-3 pt-1">

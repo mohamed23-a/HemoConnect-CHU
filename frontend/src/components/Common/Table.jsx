@@ -22,7 +22,7 @@ const Table = ({
             <tr>
               {columns.map((col, i) => (
                 <th
-                  key={i}
+                  key={col.key || `header-${i}`}
                   className="px-6 py-3.5 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider"
                 >
                   {col.header}
@@ -32,7 +32,7 @@ const Table = ({
           </thead>
           <tbody className="divide-y divide-slate-50">
             {Array.from({ length: skeletonRows }).map((_, i) => (
-              <TableRowSkeleton key={i} cols={columns.length} />
+              <TableRowSkeleton key={`table-skeleton-${i}`} cols={columns.length} />
             ))}
           </tbody>
         </table>
@@ -62,7 +62,7 @@ const Table = ({
           <tr>
             {columns.map((col, i) => (
               <th
-                key={i}
+                key={col.key || `header-main-${i}`}
                 className="px-6 py-3.5 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider"
               >
                 {col.header}
@@ -78,7 +78,7 @@ const Table = ({
         >
           {data.map((row, rowIndex) => (
             <motion.tr
-              key={rowIndex}
+              key={row.id || `row-${rowIndex}`}
               variants={staggerItem}
               onClick={() => onRowClick?.(row)}
               whileHover={
@@ -88,7 +88,7 @@ const Table = ({
             >
               {columns.map((col, colIndex) => (
                 <td
-                  key={colIndex}
+                  key={col.key || `cell-${rowIndex}-${colIndex}`}
                   className="px-6 py-4 text-sm text-slate-700 whitespace-nowrap"
                 >
                   {col.render ? col.render(row) : row[col.key]}
