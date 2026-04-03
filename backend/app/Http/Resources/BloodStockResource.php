@@ -25,10 +25,10 @@ class BloodStockResource extends JsonResource
             'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
         ];
     }
-    
+
     private function getStatusLabel(): string
     {
-        return match($this->status) {
+        return match ($this->status) {
             'available' => 'متوفر',
             'low' => 'مخزون منخفض',
             'out_of_stock' => 'نفد المخزون',

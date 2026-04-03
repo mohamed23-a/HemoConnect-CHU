@@ -27,7 +27,7 @@ class ActivityLog extends Model
     /**
      * العلاقات
      */
-    
+
     // المستخدم الذي قام بالنشاط
     public function user()
     {

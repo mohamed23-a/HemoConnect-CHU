@@ -24,7 +24,7 @@ class AuthTest extends TestCase
         ]);
 
         $response->assertStatus(200)
-                 ->assertJsonStructure(['success', 'message', 'user', 'token']);
+            ->assertJsonStructure(['success', 'message', 'user', 'token']);
     }
 
     public function test_inactive_user_cannot_login()
@@ -53,6 +53,6 @@ class AuthTest extends TestCase
         ])->postJson('/api/logout');
 
         $response->assertStatus(200)
-                 ->assertJson(['message' => 'Logged out successfully']);
+            ->assertJson(['message' => 'Logged out successfully']);
     }
 }

@@ -23,7 +23,7 @@ class BloodStock extends Model
     /**
      * Helper methods
      */
-    
+
     // التحقق من وجود كمية كافية
     public function hasEnoughQuantity($requestedQuantity)
     {
@@ -36,7 +36,7 @@ class BloodStock extends Model
         $this->quantity -= $quantity;
         $this->last_updated = now();
         $this->save();
-        
+
         return $this;
     }
 
@@ -46,7 +46,7 @@ class BloodStock extends Model
         $this->quantity += $quantity;
         $this->last_updated = now();
         $this->save();
-        
+
         return $this;
     }
 
@@ -65,6 +65,7 @@ class BloodStock extends Model
         if ($this->quantity <= $this->minimum_threshold) {
             return 'low';
         }
+
         return 'available';
     }
 }

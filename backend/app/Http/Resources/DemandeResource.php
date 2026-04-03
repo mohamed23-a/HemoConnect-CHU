@@ -4,8 +4,6 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use App\Http\Resources\UserResource;
-use App\Http\Resources\TransfusionResource;
 
 class DemandeResource extends JsonResource
 {
@@ -40,20 +38,20 @@ class DemandeResource extends JsonResource
             'updated_at' => $this->updated_at?->format('Y-m-d H:i:s'),
         ];
     }
-    
+
     private function getUrgencyLabel(): string
     {
-        return match($this->urgency) {
+        return match ($this->urgency) {
             'normal' => 'عادي',
             'urgent' => 'عاجل',
             'emergency' => 'طارئ',
             default => $this->urgency,
         };
     }
-    
+
     private function getStatusLabel(): string
     {
-        return match($this->status) {
+        return match ($this->status) {
             'pending' => 'قيد الانتظار',
             'approved' => 'مقبول',
             'rejected' => 'مرفوض',
@@ -61,10 +59,10 @@ class DemandeResource extends JsonResource
             default => $this->status,
         };
     }
-    
+
     private function getStatusColor(): string
     {
-        return match($this->status) {
+        return match ($this->status) {
             'pending' => 'yellow',
             'approved' => 'blue',
             'rejected' => 'red',

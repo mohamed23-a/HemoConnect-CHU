@@ -19,20 +19,20 @@ class DatabaseSeeder extends Seeder
     {
         // 1. إنشاء المستخدمين
         $this->createUsers();
-        
+
         // 2. إنشاء المخزون الأولي
         $this->createBloodStock();
-        
+
         // 3. إنشاء طلبات تجريبية
         $this->createDemandes();
-        
+
         // 4. إنشاء عمليات نقل
         $this->createTransfusions();
-        
+
         // 5. إنشاء إشعارات
         $this->createNotifications();
     }
-    
+
     private function createUsers(): void
     {
         // Admin
@@ -43,7 +43,7 @@ class DatabaseSeeder extends Seeder
             'role' => 'admin',
             'is_active' => true,
         ]);
-        
+
         // Blood Center
         User::create([
             'name' => 'Centre Regional de Transfusion',
@@ -53,14 +53,14 @@ class DatabaseSeeder extends Seeder
             'blood_center_name' => 'Centre Regional de Transfusion Sanguine',
             'is_active' => true,
         ]);
-        
+
         // Hospitals
         $hospitals = [
             ['name' => 'Hopital Ibn Sina', 'email' => 'ibnsina@hospital.com'],
             ['name' => 'Hopital Cheikh Zaid', 'email' => 'cheikhzaid@hospital.com'],
             ['name' => 'Hopital Militaire', 'email' => 'militaire@hospital.com'],
         ];
-        
+
         foreach ($hospitals as $hospital) {
             User::create([
                 'name' => $hospital['name'],
@@ -71,15 +71,15 @@ class DatabaseSeeder extends Seeder
                 'is_active' => true,
             ]);
         }
-        
+
         // Create 10 additional random users using factory
         User::factory(10)->create();
     }
-    
+
     private function createBloodStock(): void
     {
         $bloodTypes = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
-        
+
         foreach ($bloodTypes as $type) {
             BloodStock::create([
                 'blood_type' => $type,
@@ -89,15 +89,15 @@ class DatabaseSeeder extends Seeder
             ]);
         }
     }
-    
+
     private function createDemandes(): void
     {
         // Create 50 demandes using factory
         Demande::factory(50)->create();
-        
+
         // Create some specific demandes for testing
         $hospital = User::where('role', 'hospital')->first();
-        
+
         if ($hospital) {
             // Pending demande
             Demande::create([
@@ -111,7 +111,7 @@ class DatabaseSeeder extends Seeder
                 'status' => 'pending',
                 'notes' => 'Patient needs blood before surgery',
             ]);
-            
+
             // Approved demande
             $bloodCenter = User::where('role', 'blood_center')->first();
             Demande::create([
@@ -128,12 +128,12 @@ class DatabaseSeeder extends Seeder
             ]);
         }
     }
-    
+
     private function createTransfusions(): void
     {
         $approvedDemandes = Demande::where('status', 'approved')->get();
         $bloodCenter = User::where('role', 'blood_center')->first();
-        
+
         foreach ($approvedDemandes as $demande) {
             Transfusion::create([
                 'demande_id' => $demande->id,
@@ -143,16 +143,16 @@ class DatabaseSeeder extends Seeder
                 'processed_at' => now(),
                 'notes' => 'Transfusion completed successfully',
             ]);
-            
+
             // Update demande status to completed
             $demande->complete();
         }
     }
-    
+
     private function createNotifications(): void
     {
         $users = User::all();
-        
+
         foreach ($users->take(5) as $user) {
             Notification::create([
                 'user_id' => $user->id,
@@ -162,7 +162,7 @@ class DatabaseSeeder extends Seeder
                 'is_read' => false,
             ]);
         }
-        
+
         // Notification for low stock
         $bloodCenter = User::where('role', 'blood_center')->first();
         if ($bloodCenter) {

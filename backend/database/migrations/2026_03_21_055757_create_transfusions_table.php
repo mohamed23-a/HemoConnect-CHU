@@ -20,7 +20,7 @@ return new class extends Migration
             $table->timestamp('processed_at')->useCurrent();
             $table->text('notes')->nullable();
             $table->timestamps();
-            
+
             $table->index('processed_at');
         });
     }

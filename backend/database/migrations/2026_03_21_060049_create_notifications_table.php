@@ -20,7 +20,7 @@ return new class extends Migration
             $table->boolean('is_read')->default(false);
             $table->bigInteger('related_id')->nullable();
             $table->timestamps();
-            
+
             $table->index('user_id');
             $table->index('is_read');
         });

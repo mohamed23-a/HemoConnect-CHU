@@ -34,7 +34,7 @@ class Demande extends Model
     /**
      * العلاقات
      */
-    
+
     // المستشفى الذي أنشأ الطلب
     public function hospital()
     {
@@ -56,7 +56,6 @@ class Demande extends Model
     /**
      * Helper methods
      */
-    
     public function isPending()
     {
         return $this->status === 'pending';

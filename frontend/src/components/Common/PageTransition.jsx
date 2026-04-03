@@ -1,10 +1,10 @@
-import React from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { pageTransition } from '../../animations/variants'
-import { useLocation } from 'react-router-dom'
+import React from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { pageTransition } from "../../animations/variants";
+import { useLocation } from "react-router-dom";
 
 const PageTransition = ({ children }) => {
-  const location = useLocation()
+  const location = useLocation();
   return (
     <AnimatePresence mode="wait">
       <motion.div
@@ -13,12 +13,12 @@ const PageTransition = ({ children }) => {
         initial="hidden"
         animate="visible"
         exit="exit"
-        style={{ width: '100%' }}
+        style={{ width: "100%" }}
       >
         {children}
       </motion.div>
     </AnimatePresence>
-  )
-}
+  );
+};
 
-export default PageTransition
+export default PageTransition;

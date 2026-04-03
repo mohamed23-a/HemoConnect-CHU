@@ -14,7 +14,7 @@ class UserUpdateRequest extends FormRequest
     {
         $user = auth()->user();
         $targetUser = $this->route('id') ?? $this->route('user');
-        
+
         // Admin يمكنه تحديث أي مستخدم، المستخدم يمكنه تحديث نفسه فقط
         return $user->role === 'admin' || $user->id == $targetUser;
     }
@@ -25,10 +25,10 @@ class UserUpdateRequest extends FormRequest
     public function rules(): array
     {
         $userId = $this->route('id') ?? $this->route('user');
-        
+
         $rules = [
             'name' => 'sometimes|string|max:255',
-            'email' => 'sometimes|email|unique:users,email,' . $userId,
+            'email' => 'sometimes|email|unique:users,email,'.$userId,
             'password' => 'sometimes|string|min:8|confirmed',
         ];
 

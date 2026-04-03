@@ -11,37 +11,35 @@ class RoleMiddleware
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
      * @param  string  $role
      * @return mixed
      */
     public function handle(Request $request, Closure $next, $role)
     {
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             return response()->json([
-                'message' => 'Unauthenticated. Please login first.'
+                'message' => 'Unauthenticated. Please login first.',
             ], 401);
         }
 
         $user = Auth::user();
-        
+
         // التحقق من أن المستخدم نشط
-        if (!$user->is_active) {
+        if (! $user->is_active) {
             return response()->json([
-                'message' => 'Your account is deactivated. Please contact administrator.'
+                'message' => 'Your account is deactivated. Please contact administrator.',
             ], 403);
         }
-        
+
         // التحقق من أن المستخدم لديه الدور المطلوب
         // يمكن أن يكون الدور مفرداً أو متعدداً (admin|hospital)
         $roles = explode('|', $role);
-        
-        if (!in_array($user->role, $roles)) {
+
+        if (! in_array($user->role, $roles)) {
             return response()->json([
                 'message' => 'Unauthorized. You do not have the required role.',
                 'required_roles' => $roles,
-                'your_role' => $user->role
+                'your_role' => $user->role,
             ], 403);
         }
 

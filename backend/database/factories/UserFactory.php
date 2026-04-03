@@ -2,12 +2,13 @@
 
 namespace Database\Factories;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
+ * @extends Factory<User>
  */
 class UserFactory extends Factory
 {
@@ -21,15 +22,15 @@ class UserFactory extends Factory
     public function definition(): array
     {
         $role = $this->faker->randomElement(['admin', 'hospital', 'blood_center']);
-        
+
         return [
             'name' => $this->faker->name(),
             'email' => $this->faker->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'role' => $role,
-            'hospital_name' => $role === 'hospital' ? $this->faker->company() . ' Hospital' : null,
-            'blood_center_name' => $role === 'blood_center' ? $this->faker->company() . ' Blood Center' : null,
+            'hospital_name' => $role === 'hospital' ? $this->faker->company().' Hospital' : null,
+            'blood_center_name' => $role === 'blood_center' ? $this->faker->company().' Blood Center' : null,
             'is_active' => true,
             'remember_token' => Str::random(10),
         ];
@@ -44,7 +45,7 @@ class UserFactory extends Factory
             'email_verified_at' => null,
         ]);
     }
-    
+
     /**
      * Indicate that the user is admin.
      */
@@ -56,7 +57,7 @@ class UserFactory extends Factory
             'blood_center_name' => null,
         ]);
     }
-    
+
     /**
      * Indicate that the user is hospital.
      */
@@ -64,11 +65,11 @@ class UserFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'role' => 'hospital',
-            'hospital_name' => $this->faker->company() . ' Hospital',
+            'hospital_name' => $this->faker->company().' Hospital',
             'blood_center_name' => null,
         ]);
     }
-    
+
     /**
      * Indicate that the user is blood center.
      */
@@ -77,7 +78,7 @@ class UserFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'role' => 'blood_center',
             'hospital_name' => null,
-            'blood_center_name' => $this->faker->company() . ' Blood Center',
+            'blood_center_name' => $this->faker->company().' Blood Center',
         ]);
     }
 }

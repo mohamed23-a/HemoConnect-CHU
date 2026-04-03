@@ -9,7 +9,7 @@ class BloodStockUnitTest extends TestCase
 {
     public function test_is_low_returns_true_when_quantity_below_threshold()
     {
-        $stock = new BloodStock();
+        $stock = new BloodStock;
         $stock->quantity = 4;
         $stock->minimum_threshold = 5;
 
@@ -18,7 +18,7 @@ class BloodStockUnitTest extends TestCase
 
     public function test_is_low_returns_false_when_quantity_above_threshold()
     {
-        $stock = new BloodStock();
+        $stock = new BloodStock;
         $stock->quantity = 10;
         $stock->minimum_threshold = 5;
 
@@ -27,7 +27,7 @@ class BloodStockUnitTest extends TestCase
 
     public function test_has_enough_quantity()
     {
-        $stock = new BloodStock();
+        $stock = new BloodStock;
         $stock->quantity = 10;
 
         $this->assertTrue($stock->hasEnoughQuantity(5));

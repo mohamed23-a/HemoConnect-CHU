@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Demande;
+use App\Events\DemandeCreated;
+use App\Http\Requests\DemandeRequest;
+use App\Http\Resources\DemandeResource;
 use App\Models\ActivityLog;
+use App\Models\Demande;
 use App\Models\Notification;
 use App\Models\Transfusion;
 use App\Services\StockService;
-use App\Http\Requests\DemandeRequest;
-use App\Http\Resources\DemandeResource;
-use App\Events\DemandeCreated;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Log;
 class DemandeController extends Controller
 {
     protected $stockService;
-    
+
     public function __construct(StockService $stockService)
     {
         $this->stockService = $stockService;
@@ -26,32 +26,32 @@ class DemandeController extends Controller
     public function index(Request $request)
     {
         $user = $request->user();
-        
+
         $query = Demande::with(['hospital', 'treatedBy', 'transfusion']);
-        
+
         if ($user->role === 'hospital') {
             $query->where('user_id', $user->id);
         } elseif ($user->role === 'blood_center') {
             $query->orderBy('created_at', 'desc');
         }
-        
+
         if ($request->has('status')) {
             $query->where('status', $request->status);
         }
-        
+
         if ($request->has('blood_type')) {
             $query->where('blood_type', $request->blood_type);
         }
-        
+
         if ($request->has('user_id') && in_array($user->role, ['admin', 'blood_center'])) {
             $query->where(function ($q) use ($request) {
                 $q->where('user_id', $request->user_id)
-                  ->orWhere('treated_by', $request->user_id);
+                    ->orWhere('treated_by', $request->user_id);
             });
         }
-        
+
         $demandes = $query->paginate(15);
-        
+
         return response()->json([
             'success' => true,
             'data' => DemandeResource::collection($demandes),
@@ -60,23 +60,23 @@ class DemandeController extends Controller
                 'last_page' => $demandes->lastPage(),
                 'per_page' => $demandes->perPage(),
                 'total' => $demandes->total(),
-            ]
+            ],
         ]);
     }
 
     public function store(DemandeRequest $request)
     {
         $user = $request->user();
-        
+
         if ($user->role !== 'hospital') {
             return response()->json([
-                'message' => 'Only hospitals can create transfusion requests.'
+                'message' => 'Only hospitals can create transfusion requests.',
             ], 403);
         }
-        
+
         try {
             DB::beginTransaction();
-            
+
             $demande = Demande::create([
                 'user_id' => $user->id,
                 'patient_name' => $request->patient_name,
@@ -88,9 +88,9 @@ class DemandeController extends Controller
                 'notes' => $request->notes,
                 'status' => 'pending',
             ]);
-            
+
             event(new DemandeCreated($demande));
-            
+
             ActivityLog::log(
                 $user->id,
                 'demande_created',
@@ -98,18 +98,20 @@ class DemandeController extends Controller
                 null,
                 $demande->toArray()
             );
-            
+
             DB::commit();
+
             return response()->json([
                 'success' => true,
                 'message' => 'Transfusion request created successfully',
-                'data' => new DemandeResource($demande->load('hospital'))
+                'data' => new DemandeResource($demande->load('hospital')),
             ], 201);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error creating demande: ' . $e->getMessage(), ['exception' => $e]);
+            Log::error('Error creating demande: '.$e->getMessage(), ['exception' => $e]);
+
             return response()->json([
-                'message' => 'An error occurred while creating the request.'
+                'message' => 'An error occurred while creating the request.',
             ], 500);
         }
     }
@@ -117,16 +119,16 @@ class DemandeController extends Controller
     public function show(Request $request, $id)
     {
         $demande = Demande::with(['hospital', 'treatedBy', 'transfusion'])->findOrFail($id);
-        
+
         $user = $request->user();
-        
+
         if ($user->role === 'hospital' && $demande->user_id !== $user->id) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
-        
+
         return response()->json([
             'success' => true,
-            'data' => new DemandeResource($demande)
+            'data' => new DemandeResource($demande),
         ]);
     }
 
@@ -134,22 +136,22 @@ class DemandeController extends Controller
     {
         $demande = Demande::findOrFail($id);
         $user = $request->user();
-        
+
         if ($user->role !== 'hospital' || $demande->user_id !== $user->id) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
-        
+
         if ($demande->status !== 'pending') {
             return response()->json([
-                'message' => 'Cannot update demande that has already been processed.'
+                'message' => 'Cannot update demande that has already been processed.',
             ], 400);
         }
-        
+
         try {
             DB::beginTransaction();
             $oldData = $demande->toArray();
             $demande->update($request->validated());
-            
+
             ActivityLog::log(
                 $user->id,
                 'demande_updated',
@@ -157,18 +159,20 @@ class DemandeController extends Controller
                 $oldData,
                 $demande->toArray()
             );
-            
+
             DB::commit();
+
             return response()->json([
                 'success' => true,
                 'message' => 'Demande updated successfully',
-                'data' => new DemandeResource($demande)
+                'data' => new DemandeResource($demande),
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error updating demande: ' . $e->getMessage(), ['exception' => $e]);
+            Log::error('Error updating demande: '.$e->getMessage(), ['exception' => $e]);
+
             return response()->json([
-                'message' => 'An error occurred while updating the request.'
+                'message' => 'An error occurred while updating the request.',
             ], 500);
         }
     }
@@ -177,22 +181,22 @@ class DemandeController extends Controller
     {
         $demande = Demande::findOrFail($id);
         $user = $request->user();
-        
+
         if ($user->role !== 'hospital' || $demande->user_id !== $user->id) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
-        
+
         if ($demande->status !== 'pending') {
             return response()->json([
-                'message' => 'Cannot cancel demande that has already been processed.'
+                'message' => 'Cannot cancel demande that has already been processed.',
             ], 400);
         }
-        
+
         try {
             DB::beginTransaction();
             $demande->status = 'cancelled';
             $demande->save();
-            
+
             ActivityLog::log(
                 $user->id,
                 'demande_cancelled',
@@ -200,18 +204,20 @@ class DemandeController extends Controller
                 ['status' => 'pending'],
                 ['status' => 'cancelled']
             );
-            
+
             DB::commit();
+
             return response()->json([
                 'success' => true,
                 'message' => 'Demande cancelled successfully',
-                'data' => new DemandeResource($demande)
+                'data' => new DemandeResource($demande),
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error cancelling demande: ' . $e->getMessage(), ['exception' => $e]);
+            Log::error('Error cancelling demande: '.$e->getMessage(), ['exception' => $e]);
+
             return response()->json([
-                'message' => 'An error occurred while cancelling the request.'
+                'message' => 'An error occurred while cancelling the request.',
             ], 500);
         }
     }
@@ -220,37 +226,37 @@ class DemandeController extends Controller
     {
         $demande = Demande::findOrFail($id);
         $user = $request->user();
-        
-        if (!in_array($user->role, ['blood_center', 'admin'])) {
+
+        if (! in_array($user->role, ['blood_center', 'admin'])) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
-        
-        if (!$demande->isPending()) {
+
+        if (! $demande->isPending()) {
             return response()->json([
-                'message' => 'This demande has already been processed.'
+                'message' => 'This demande has already been processed.',
             ], 400);
         }
-        
+
         $availability = $this->stockService->checkAvailability(
-            $demande->blood_type, 
+            $demande->blood_type,
             $demande->quantity
         );
-        
-        if (!$availability['available']) {
+
+        if (! $availability['available']) {
             return response()->json([
                 'message' => $availability['message'],
                 'available_quantity' => $availability['current_stock'],
-                'requested_quantity' => $demande->quantity
+                'requested_quantity' => $demande->quantity,
             ], 400);
         }
-        
+
         DB::beginTransaction();
-        
+
         try {
             $this->stockService->deductForDemande($demande, $user->id);
-            
+
             $demande->approve($user->id);
-            
+
             $transfusion = Transfusion::create([
                 'demande_id' => $demande->id,
                 'blood_type' => $demande->blood_type,
@@ -259,7 +265,7 @@ class DemandeController extends Controller
                 'processed_at' => now(),
                 'notes' => $request->notes ?? 'Demande approved and processed',
             ]);
-            
+
             ActivityLog::log(
                 $user->id,
                 'demande_approved',
@@ -267,7 +273,7 @@ class DemandeController extends Controller
                 null,
                 ['demande' => $demande->toArray()]
             );
-            
+
             Notification::createNotification(
                 $demande->user_id,
                 '✅ Demande Approuvée',
@@ -275,27 +281,27 @@ class DemandeController extends Controller
                 'demande_approved',
                 $demande->id
             );
-            
+
             DB::commit();
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Demande approved successfully',
-                'data' => new DemandeResource($demande->load(['hospital', 'transfusion']))
+                'data' => new DemandeResource($demande->load(['hospital', 'transfusion'])),
             ]);
-            
+
         } catch (\Exception $e) {
             DB::rollBack();
-            
+
             ActivityLog::log(
                 $user->id,
                 'demande_approve_failed',
-                "Failed to approve demande #{$demande->id}: " . $e->getMessage()
+                "Failed to approve demande #{$demande->id}: ".$e->getMessage()
             );
-            
+
             return response()->json([
                 'message' => 'An error occurred while processing the demande.',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -303,26 +309,26 @@ class DemandeController extends Controller
     public function reject(Request $request, $id)
     {
         $request->validate([
-            'rejection_reason' => 'required|string|min:10'
+            'rejection_reason' => 'required|string|min:10',
         ]);
-        
+
         $demande = Demande::findOrFail($id);
         $user = $request->user();
-        
-        if (!in_array($user->role, ['blood_center', 'admin'])) {
+
+        if (! in_array($user->role, ['blood_center', 'admin'])) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
-        
-        if (!$demande->isPending()) {
+
+        if (! $demande->isPending()) {
             return response()->json([
-                'message' => 'This demande has already been processed.'
+                'message' => 'This demande has already been processed.',
             ], 400);
         }
-        
+
         try {
             DB::beginTransaction();
             $demande->reject($user->id, $request->rejection_reason);
-            
+
             ActivityLog::log(
                 $user->id,
                 'demande_rejected',
@@ -330,7 +336,7 @@ class DemandeController extends Controller
                 null,
                 ['rejection_reason' => $request->rejection_reason]
             );
-            
+
             Notification::createNotification(
                 $demande->user_id,
                 '❌ Demande Refusée',
@@ -338,18 +344,20 @@ class DemandeController extends Controller
                 'demande_rejected',
                 $demande->id
             );
-            
+
             DB::commit();
+
             return response()->json([
                 'success' => true,
                 'message' => 'Demande rejected successfully',
-                'data' => new DemandeResource($demande)
+                'data' => new DemandeResource($demande),
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error rejecting demande: ' . $e->getMessage(), ['exception' => $e]);
+            Log::error('Error rejecting demande: '.$e->getMessage(), ['exception' => $e]);
+
             return response()->json([
-                'message' => 'An error occurred while rejecting the request.'
+                'message' => 'An error occurred while rejecting the request.',
             ], 500);
         }
     }
@@ -358,27 +366,27 @@ class DemandeController extends Controller
     {
         $demande = Demande::findOrFail($id);
         $user = $request->user();
-        
-        if (!in_array($user->role, ['blood_center', 'admin'])) {
+
+        if (! in_array($user->role, ['blood_center', 'admin'])) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
-        
-        if (!$demande->isApproved()) {
+
+        if (! $demande->isApproved()) {
             return response()->json([
-                'message' => 'Only approved demandes can be completed.'
+                'message' => 'Only approved demandes can be completed.',
             ], 400);
         }
-        
+
         try {
             DB::beginTransaction();
             $demande->complete();
-            
+
             if ($demande->transfusion) {
                 $demande->transfusion->update([
-                    'notes' => $request->notes ?? ($demande->transfusion->notes . ' - Completed')
+                    'notes' => $request->notes ?? ($demande->transfusion->notes.' - Completed'),
                 ]);
             }
-            
+
             ActivityLog::log(
                 $user->id,
                 'demande_completed',
@@ -386,18 +394,20 @@ class DemandeController extends Controller
                 null,
                 ['completed_at' => now()]
             );
-            
+
             DB::commit();
+
             return response()->json([
                 'success' => true,
                 'message' => 'Demande completed successfully',
-                'data' => new DemandeResource($demande)
+                'data' => new DemandeResource($demande),
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error completing demande: ' . $e->getMessage(), ['exception' => $e]);
+            Log::error('Error completing demande: '.$e->getMessage(), ['exception' => $e]);
+
             return response()->json([
-                'message' => 'An error occurred while completing the request.'
+                'message' => 'An error occurred while completing the request.',
             ], 500);
         }
     }

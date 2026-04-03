@@ -25,7 +25,7 @@ class Transfusion extends Model
     /**
      * العلاقات
      */
-    
+
     // الطلب المرتبط بهذه العملية
     public function demande()
     {

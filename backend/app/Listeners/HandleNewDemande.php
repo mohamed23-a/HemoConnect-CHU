@@ -18,18 +18,18 @@ class HandleNewDemande implements ShouldQueue
     public function handle(DemandeCreated $event): void
     {
         $demande = $event->demande;
-        
+
         // إرسال إشعارات لجميع مستخدمي مركز الدم
         $bloodCenterUsers = User::where('role', 'blood_center')
             ->where('is_active', true)
             ->get();
-        
-        $urgencyMessage = match($demande->urgency) {
+
+        $urgencyMessage = match ($demande->urgency) {
             'emergency' => '⚠️ طلب طارئ جداً!',
             'urgent' => '⚡ طلب عاجل!',
             default => 'طلب جديد',
         };
-        
+
         foreach ($bloodCenterUsers as $user) {
             Notification::createNotification(
                 $user->id,
@@ -39,7 +39,7 @@ class HandleNewDemande implements ShouldQueue
                 $demande->id
             );
         }
-        
+
         // إذا كان الطلب طارئاً، إرسال إشعار إضافي للمسؤول
         if ($demande->urgency === 'emergency') {
             $admins = User::where('role', 'admin')->where('is_active', true)->get();

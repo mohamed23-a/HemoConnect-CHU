@@ -2,11 +2,12 @@
 
 namespace Database\Factories;
 
+use App\Models\Demande;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Demande>
+ * @extends Factory<Demande>
  */
 class DemandeFactory extends Factory
 {
@@ -20,7 +21,7 @@ class DemandeFactory extends Factory
         $bloodTypes = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
         $statuses = ['pending', 'approved', 'rejected', 'completed'];
         $urgencies = ['normal', 'urgent', 'emergency'];
-        
+
         return [
             'user_id' => User::where('role', 'hospital')->inRandomOrder()->first()?->id ?? 1,
             'patient_name' => $this->faker->name(),
@@ -37,7 +38,7 @@ class DemandeFactory extends Factory
             'notes' => $this->faker->optional()->sentence(),
         ];
     }
-    
+
     /**
      * Indicate that the demande is pending.
      */
@@ -49,7 +50,7 @@ class DemandeFactory extends Factory
             'treated_at' => null,
         ]);
     }
-    
+
     /**
      * Indicate that the demande is approved.
      */
@@ -61,7 +62,7 @@ class DemandeFactory extends Factory
             'treated_at' => now(),
         ]);
     }
-    
+
     /**
      * Indicate that the demande is completed.
      */

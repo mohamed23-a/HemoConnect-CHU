@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use App\Models\ActivityLog;
+use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
@@ -27,16 +27,16 @@ class AuthController extends Controller
         $user = User::where('email', $request->email)->first();
 
         // التحقق من وجود المستخدم وكلمة المرور
-        if (!$user || !Hash::check($request->password, $user->password)) {
+        if (! $user || ! Hash::check($request->password, $user->password)) {
             throw ValidationException::withMessages([
                 'email' => ['The provided credentials are incorrect.'],
             ]);
         }
 
         // التحقق من أن المستخدم نشط
-        if (!$user->is_active) {
+        if (! $user->is_active) {
             return response()->json([
-                'message' => 'Your account is deactivated. Please contact administrator.'
+                'message' => 'Your account is deactivated. Please contact administrator.',
             ], 403);
         }
 
@@ -66,7 +66,7 @@ class AuthController extends Controller
                 'role' => $user->role,
                 'hospital_name' => $user->hospital_name,
                 'blood_center_name' => $user->blood_center_name,
-                'is_super_admin' => (bool)$user->is_super_admin,
+                'is_super_admin' => (bool) $user->is_super_admin,
             ],
             'token' => $token,
             'token_type' => 'Bearer',
@@ -82,7 +82,7 @@ class AuthController extends Controller
         // التحقق من الصلاحيات (فقط admin)
         if (Auth::check() && Auth::user()->role !== 'admin') {
             return response()->json([
-                'message' => 'Unauthorized. Only administrators can create new users.'
+                'message' => 'Unauthorized. Only administrators can create new users.',
             ], 403);
         }
 
@@ -113,7 +113,7 @@ class AuthController extends Controller
         ActivityLog::log(
             Auth::id(),
             'user_created',
-            'New user created: ' . $user->email,
+            'New user created: '.$user->email,
             null,
             ['user_id' => $user->id, 'role' => $user->role]
         );
@@ -126,8 +126,8 @@ class AuthController extends Controller
                 'name' => $user->name,
                 'email' => $user->email,
                 'role' => $user->role,
-                'is_super_admin' => (bool)$user->is_super_admin,
-            ]
+                'is_super_admin' => (bool) $user->is_super_admin,
+            ],
         ], 201);
     }
 
@@ -138,7 +138,7 @@ class AuthController extends Controller
     {
         try {
             $user = $request->user();
-            
+
             // تسجيل النشاط قبل حذف التوكن
             ActivityLog::log(
                 $user->id,
@@ -147,7 +147,7 @@ class AuthController extends Controller
                 null,
                 ['ip' => $request->ip()]
             );
-            
+
             // حذف التوكن الحالي بأمان
             $token = $request->user()->currentAccessToken();
             if ($token) {
@@ -156,12 +156,13 @@ class AuthController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Logged out successfully'
+                'message' => 'Logged out successfully',
             ]);
         } catch (\Exception $e) {
-            Log::error('Error during logout: ' . $e->getMessage(), ['exception' => $e]);
+            Log::error('Error during logout: '.$e->getMessage(), ['exception' => $e]);
+
             return response()->json([
-                'message' => 'An error occurred during logout.'
+                'message' => 'An error occurred during logout.',
             ], 500);
         }
     }
@@ -172,7 +173,7 @@ class AuthController extends Controller
     public function me(Request $request)
     {
         $user = $request->user();
-        
+
         return response()->json([
             'success' => true,
             'user' => [
@@ -182,10 +183,10 @@ class AuthController extends Controller
                 'role' => $user->role,
                 'hospital_name' => $user->hospital_name,
                 'blood_center_name' => $user->blood_center_name,
-                'is_active' => (bool)$user->is_active,
-                'is_super_admin' => (bool)$user->is_super_admin,
+                'is_active' => (bool) $user->is_active,
+                'is_super_admin' => (bool) $user->is_super_admin,
                 'created_at' => $user->created_at,
-            ]
+            ],
         ]);
     }
 
@@ -203,9 +204,9 @@ class AuthController extends Controller
             $user = $request->user();
 
             // التحقق من كلمة المرور الحالية
-            if (!Hash::check($request->current_password, $user->password)) {
+            if (! Hash::check($request->current_password, $user->password)) {
                 return response()->json([
-                    'message' => 'Current password is incorrect'
+                    'message' => 'Current password is incorrect',
                 ], 400);
             }
 
@@ -224,12 +225,13 @@ class AuthController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Password changed successfully'
+                'message' => 'Password changed successfully',
             ]);
         } catch (\Exception $e) {
-            Log::error('Error changing password: ' . $e->getMessage(), ['exception' => $e]);
+            Log::error('Error changing password: '.$e->getMessage(), ['exception' => $e]);
+
             return response()->json([
-                'message' => 'An error occurred while changing password.'
+                'message' => 'An error occurred while changing password.',
             ], 500);
         }
     }

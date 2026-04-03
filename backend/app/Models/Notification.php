@@ -25,7 +25,7 @@ class Notification extends Model
     /**
      * العلاقات
      */
-    
+
     // المستخدم الذي له هذا الإشعار
     public function user()
     {
@@ -35,7 +35,6 @@ class Notification extends Model
     /**
      * Helper methods
      */
-    
     public function markAsRead()
     {
         $this->is_read = true;

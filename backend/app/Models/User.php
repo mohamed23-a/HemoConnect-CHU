@@ -56,7 +56,7 @@ class User extends Authenticatable
     /**
      * العلاقات
      */
-    
+
     // المستشفى لديه عدة طلبات
     public function demandes()
     {

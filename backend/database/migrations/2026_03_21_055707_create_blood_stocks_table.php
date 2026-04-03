@@ -18,7 +18,7 @@ return new class extends Migration
             $table->integer('minimum_threshold')->default(5);
             $table->timestamp('last_updated')->useCurrent();
             $table->timestamps();
-            
+
             $table->index('blood_type');
         });
     }

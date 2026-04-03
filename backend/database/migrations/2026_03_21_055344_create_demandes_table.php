@@ -27,7 +27,7 @@ return new class extends Migration
             $table->timestamp('completed_at')->nullable();
             $table->text('notes')->nullable();
             $table->timestamps();
-            
+
             // إضافة indexes لتحسين الأداء
             $table->index('status');
             $table->index('blood_type');
