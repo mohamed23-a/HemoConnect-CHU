@@ -275,7 +275,7 @@ const AdminDashboard = () => {
       {/* Recent activities */}
       {!loading && !error && stats?.recent_activities?.length > 0 && (
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5, duration: 0.4 }}>
-          <Card title="آخر النشاطات">
+          <Card title={t('dashboard.recent_activities') || 'آخر النشاطات'}>
             <motion.div variants={staggerContainer} initial="hidden" animate="visible" className="space-y-1">
               {stats.recent_activities.slice(0, 10).map((a, idx) => (
                 <motion.div key={idx} variants={staggerItem}

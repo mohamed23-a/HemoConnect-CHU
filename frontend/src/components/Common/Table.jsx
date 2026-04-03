@@ -3,8 +3,10 @@ import { motion } from 'framer-motion'
 import { TableRowSkeleton } from './SkeletonLoader'
 import { staggerContainer, staggerItem } from '../../animations/variants'
 import { InboxIcon } from '@heroicons/react/24/outline'
+import { useTranslation } from 'react-i18next'
 
 const Table = ({ columns, data, onRowClick, loading = false, skeletonRows = 5 }) => {
+  const { t } = useTranslation()
   if (loading) {
     return (
       <div className="overflow-x-auto">
@@ -36,7 +38,7 @@ const Table = ({ columns, data, onRowClick, loading = false, skeletonRows = 5 })
         className="py-16 text-center"
       >
         <InboxIcon className="w-10 h-10 text-slate-200 mx-auto mb-3" />
-        <p className="text-slate-400 text-sm">لا توجد بيانات لعرضها</p>
+        <p className="text-slate-400 text-sm">{t('common.no_data') || 'لا توجد بيانات لعرضها'}</p>
       </motion.div>
     )
   }

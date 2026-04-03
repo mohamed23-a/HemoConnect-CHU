@@ -29,22 +29,26 @@ const LoadingSpinner = ({ size = 'md', color = 'blue' }) => {
   )
 }
 
-// Full-page loader
-export const PageLoader = () => (
-  <div className="fixed inset-0 flex flex-col items-center justify-center bg-white z-50 gap-4">
-    <motion.div
-      className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full"
-      animate={{ rotate: 360 }}
-      transition={{ repeat: Infinity, duration: 0.75, ease: 'linear' }}
-    />
-    <motion.p
-      className="text-slate-500 text-sm font-medium"
-      animate={{ opacity: [0.5, 1, 0.5] }}
-      transition={{ repeat: Infinity, duration: 1.5 }}
-    >
-      جارٍ التحميل...
-    </motion.p>
-  </div>
-)
+import { useTranslation } from 'react-i18next'
+
+export const PageLoader = () => {
+  const { t } = useTranslation()
+  return (
+    <div className="fixed inset-0 flex flex-col items-center justify-center bg-white z-50 gap-4">
+      <motion.div
+        className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full"
+        animate={{ rotate: 360 }}
+        transition={{ repeat: Infinity, duration: 0.75, ease: 'linear' }}
+      />
+      <motion.p
+        className="text-slate-500 text-sm font-medium"
+        animate={{ opacity: [0.5, 1, 0.5] }}
+        transition={{ repeat: Infinity, duration: 1.5 }}
+      >
+        {t('common.loading')}
+      </motion.p>
+    </div>
+  )
+}
 
 export default LoadingSpinner

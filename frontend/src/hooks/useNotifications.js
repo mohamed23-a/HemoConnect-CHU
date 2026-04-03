@@ -1,7 +1,9 @@
 import { useState, useEffect, useCallback } from 'react'
 import dashboardService from '../services/dashboardService'
+import { useTranslation } from 'react-i18next'
 
 const useNotifications = () => {
+  const { t } = useTranslation()
   const [notifications, setNotifications] = useState([])
   const [unreadCount, setUnreadCount] = useState(0)
   const [loading, setLoading] = useState(true)
@@ -17,7 +19,7 @@ const useNotifications = () => {
       setError(null)
     } catch (err) {
       console.error('Error fetching notifications:', err)
-      setError('فشل تحميل الإشعارات')
+      setError(t('notifications.fetch_failed') || 'فشل تحميل الإشعارات')
     } finally {
       setLoading(false)
     }

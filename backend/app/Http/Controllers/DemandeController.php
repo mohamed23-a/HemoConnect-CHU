@@ -12,6 +12,7 @@ use App\Http\Resources\DemandeResource;
 use App\Events\DemandeCreated;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class DemandeController extends Controller
 {
@@ -73,33 +74,44 @@ class DemandeController extends Controller
             ], 403);
         }
         
-        $demande = Demande::create([
-            'user_id' => $user->id,
-            'patient_name' => $request->patient_name,
-            'patient_age' => $request->patient_age,
-            'blood_type' => $request->blood_type,
-            'quantity' => $request->quantity,
-            'reason' => $request->reason,
-            'urgency' => $request->urgency,
-            'notes' => $request->notes,
-            'status' => 'pending',
-        ]);
-        
-        event(new DemandeCreated($demande));
-        
-        ActivityLog::log(
-            $user->id,
-            'demande_created',
-            "New transfusion request created for patient {$request->patient_name}",
-            null,
-            $demande->toArray()
-        );
-        
-        return response()->json([
-            'success' => true,
-            'message' => 'Transfusion request created successfully',
-            'data' => new DemandeResource($demande->load('hospital'))
-        ], 201);
+        try {
+            DB::beginTransaction();
+            
+            $demande = Demande::create([
+                'user_id' => $user->id,
+                'patient_name' => $request->patient_name,
+                'patient_age' => $request->patient_age,
+                'blood_type' => $request->blood_type,
+                'quantity' => $request->quantity,
+                'reason' => $request->reason,
+                'urgency' => $request->urgency,
+                'notes' => $request->notes,
+                'status' => 'pending',
+            ]);
+            
+            event(new DemandeCreated($demande));
+            
+            ActivityLog::log(
+                $user->id,
+                'demande_created',
+                "New transfusion request created for patient {$request->patient_name}",
+                null,
+                $demande->toArray()
+            );
+            
+            DB::commit();
+            return response()->json([
+                'success' => true,
+                'message' => 'Transfusion request created successfully',
+                'data' => new DemandeResource($demande->load('hospital'))
+            ], 201);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error creating demande: ' . $e->getMessage(), ['exception' => $e]);
+            return response()->json([
+                'message' => 'An error occurred while creating the request.'
+            ], 500);
+        }
     }
 
     public function show(Request $request, $id)
@@ -133,22 +145,32 @@ class DemandeController extends Controller
             ], 400);
         }
         
-        $oldData = $demande->toArray();
-        $demande->update($request->validated());
-        
-        ActivityLog::log(
-            $user->id,
-            'demande_updated',
-            "Transfusion request updated for patient {$demande->patient_name}",
-            $oldData,
-            $demande->toArray()
-        );
-        
-        return response()->json([
-            'success' => true,
-            'message' => 'Demande updated successfully',
-            'data' => new DemandeResource($demande)
-        ]);
+        try {
+            DB::beginTransaction();
+            $oldData = $demande->toArray();
+            $demande->update($request->validated());
+            
+            ActivityLog::log(
+                $user->id,
+                'demande_updated',
+                "Transfusion request updated for patient {$demande->patient_name}",
+                $oldData,
+                $demande->toArray()
+            );
+            
+            DB::commit();
+            return response()->json([
+                'success' => true,
+                'message' => 'Demande updated successfully',
+                'data' => new DemandeResource($demande)
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error updating demande: ' . $e->getMessage(), ['exception' => $e]);
+            return response()->json([
+                'message' => 'An error occurred while updating the request.'
+            ], 500);
+        }
     }
 
     public function cancel(Request $request, $id)
@@ -166,22 +188,32 @@ class DemandeController extends Controller
             ], 400);
         }
         
-        $demande->status = 'cancelled';
-        $demande->save();
-        
-        ActivityLog::log(
-            $user->id,
-            'demande_cancelled',
-            "Transfusion request cancelled for patient {$demande->patient_name}",
-            ['status' => 'pending'],
-            ['status' => 'cancelled']
-        );
-        
-        return response()->json([
-            'success' => true,
-            'message' => 'Demande cancelled successfully',
-            'data' => new DemandeResource($demande)
-        ]);
+        try {
+            DB::beginTransaction();
+            $demande->status = 'cancelled';
+            $demande->save();
+            
+            ActivityLog::log(
+                $user->id,
+                'demande_cancelled',
+                "Transfusion request cancelled for patient {$demande->patient_name}",
+                ['status' => 'pending'],
+                ['status' => 'cancelled']
+            );
+            
+            DB::commit();
+            return response()->json([
+                'success' => true,
+                'message' => 'Demande cancelled successfully',
+                'data' => new DemandeResource($demande)
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error cancelling demande: ' . $e->getMessage(), ['exception' => $e]);
+            return response()->json([
+                'message' => 'An error occurred while cancelling the request.'
+            ], 500);
+        }
     }
 
     public function approve(Request $request, $id)
@@ -287,29 +319,39 @@ class DemandeController extends Controller
             ], 400);
         }
         
-        $demande->reject($user->id, $request->rejection_reason);
-        
-        ActivityLog::log(
-            $user->id,
-            'demande_rejected',
-            "Demande #{$demande->id} rejected by {$user->name}",
-            null,
-            ['rejection_reason' => $request->rejection_reason]
-        );
-        
-        Notification::createNotification(
-            $demande->user_id,
-            '❌ Demande Refusée',
-            "Votre demande de transfusion pour {$demande->patient_name} a été refusée. Raison: {$request->rejection_reason}",
-            'demande_rejected',
-            $demande->id
-        );
-        
-        return response()->json([
-            'success' => true,
-            'message' => 'Demande rejected successfully',
-            'data' => new DemandeResource($demande)
-        ]);
+        try {
+            DB::beginTransaction();
+            $demande->reject($user->id, $request->rejection_reason);
+            
+            ActivityLog::log(
+                $user->id,
+                'demande_rejected',
+                "Demande #{$demande->id} rejected by {$user->name}",
+                null,
+                ['rejection_reason' => $request->rejection_reason]
+            );
+            
+            Notification::createNotification(
+                $demande->user_id,
+                '❌ Demande Refusée',
+                "Votre demande de transfusion pour {$demande->patient_name} a été refusée. Raison: {$request->rejection_reason}",
+                'demande_rejected',
+                $demande->id
+            );
+            
+            DB::commit();
+            return response()->json([
+                'success' => true,
+                'message' => 'Demande rejected successfully',
+                'data' => new DemandeResource($demande)
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error rejecting demande: ' . $e->getMessage(), ['exception' => $e]);
+            return response()->json([
+                'message' => 'An error occurred while rejecting the request.'
+            ], 500);
+        }
     }
 
     public function complete(Request $request, $id)
@@ -327,26 +369,36 @@ class DemandeController extends Controller
             ], 400);
         }
         
-        $demande->complete();
-        
-        if ($demande->transfusion) {
-            $demande->transfusion->update([
-                'notes' => $request->notes ?? ($demande->transfusion->notes . ' - Completed')
+        try {
+            DB::beginTransaction();
+            $demande->complete();
+            
+            if ($demande->transfusion) {
+                $demande->transfusion->update([
+                    'notes' => $request->notes ?? ($demande->transfusion->notes . ' - Completed')
+                ]);
+            }
+            
+            ActivityLog::log(
+                $user->id,
+                'demande_completed',
+                "Demande #{$demande->id} completed by {$user->name}",
+                null,
+                ['completed_at' => now()]
+            );
+            
+            DB::commit();
+            return response()->json([
+                'success' => true,
+                'message' => 'Demande completed successfully',
+                'data' => new DemandeResource($demande)
             ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error completing demande: ' . $e->getMessage(), ['exception' => $e]);
+            return response()->json([
+                'message' => 'An error occurred while completing the request.'
+            ], 500);
         }
-        
-        ActivityLog::log(
-            $user->id,
-            'demande_completed',
-            "Demande #{$demande->id} completed by {$user->name}",
-            null,
-            ['completed_at' => now()]
-        );
-        
-        return response()->json([
-            'success' => true,
-            'message' => 'Demande completed successfully',
-            'data' => new DemandeResource($demande)
-        ]);
     }
 }

@@ -37,18 +37,36 @@ const HospitalDashboard = () => {
   const [demandes, setDemandes]   = useState([])
   const [loading, setLoading]     = useState(true)
 
-  useEffect(() => { fetchData() }, [])
-
-  const fetchData = async () => {
-    setLoading(true)
-    try {
-      const [sR, dR] = await Promise.all([
-        dashboardService.getStats(),
-        demandeService.getDemandes({ per_page: 5 }),
-      ])
-      setStats(sR.data)
-      setDemandes(dR.data || [])
-    } catch { } finally { setLoading(false) }
+  useEffect(() => { 
+    let isMounted = true;
+    
+    const fetchData = async () => {
+      setLoading(true)
+      try {
+        const [sR, dR] = await Promise.all([
+          dashboardService.getStats(),
+          demandeService.getDemandes({ per_page: 5 }),
+        ])
+        if (isMounted) {
+          setStats(sR.data)
+          setDemandes(dR.data || [])
+        }
+      } catch (error) {
+        if (isMounted) console.error('Error fetching dashboard data:', error)
+      } finally { 
+        if (isMounted) setLoading(false) 
+      }
+    }
+    
+    fetchData()
+    return () => { isMounted = false }
+  }, [])
+  
+  const handleRefresh = () => {
+    // Just trigger the effect or manually fetch, since fetchData is inside effect now.
+    // Better to pull it out or simply reload:
+    setLoading(true);
+    dashboardService.getStats().then(sR => setStats(sR.data)).catch(console.error).finally(() => setLoading(false));
   }
 
   const statusBadge = (s) => {
@@ -74,7 +92,7 @@ const HospitalDashboard = () => {
           <p className="text-sm mt-0.5" style={{ color: 'var(--text-muted)' }}>{t('common.welcome')}, {user?.name}</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={fetchData} icon={ArrowPathIcon}>{t('common.refresh')}</Button>
+          <Button variant="outline" size="sm" onClick={handleRefresh} icon={ArrowPathIcon}>{t('common.refresh')}</Button>
           <Link to="/demandes/create">
             <Button variant="primary" size="sm" icon={PlusCircleIcon}>{t('demandes.new_request')}</Button>
           </Link>

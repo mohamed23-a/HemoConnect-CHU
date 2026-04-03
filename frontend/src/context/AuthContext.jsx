@@ -1,6 +1,7 @@
 import React, { createContext, useState, useContext, useEffect } from 'react'
 import authService from '../services/authService'
 import toast from 'react-hot-toast'
+import { useTranslation } from 'react-i18next'
 
 const AuthContext = createContext()
 
@@ -13,6 +14,7 @@ export const useAuth = () => {
 }
 
 export const AuthProvider = ({ children }) => {
+  const { t } = useTranslation()
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
   const [token, setToken] = useState(localStorage.getItem('token'))
@@ -31,10 +33,10 @@ export const AuthProvider = ({ children }) => {
       const response = await authService.login({ email, password })
       setUser(response.user)
       setToken(response.token)
-      toast.success('تم تسجيل الدخول بنجاح')
+      toast.success(t('auth.login_success') || 'تم تسجيل الدخول بنجاح')
       return { success: true }
     } catch (error) {
-      toast.error(error.message || 'فشل تسجيل الدخول')
+      toast.error(error.message || t('auth.login_failed') || 'فشل تسجيل الدخول')
       return { success: false, error: error.message }
     }
   }
@@ -47,17 +49,17 @@ export const AuthProvider = ({ children }) => {
     } finally {
       setUser(null)
       setToken(null)
-      toast.success('تم تسجيل الخروج')
+      toast.success(t('auth.logout_success') || 'تم تسجيل الخروج')
     }
   }
 
   const register = async (userData) => {
     try {
       const response = await authService.register(userData)
-      toast.success('تم إنشاء المستخدم بنجاح')
+      toast.success(t('auth.user_created_success') || 'تم إنشاء المستخدم بنجاح')
       return { success: true, data: response }
     } catch (error) {
-      toast.error(error.message || 'فشل إنشاء المستخدم')
+      toast.error(error.message || t('auth.user_created_failed') || 'فشل إنشاء المستخدم')
       return { success: false, error: error.message }
     }
   }
@@ -69,10 +71,10 @@ export const AuthProvider = ({ children }) => {
         new_password: newPassword,
         new_password_confirmation: newPassword,
       })
-      toast.success('تم تغيير كلمة المرور بنجاح')
+      toast.success(t('auth.password_changed_success') || 'تم تغيير كلمة المرور بنجاح')
       return { success: true }
     } catch (error) {
-      toast.error(error.message || 'فشل تغيير كلمة المرور')
+      toast.error(error.message || t('auth.password_changed_failed') || 'فشل تغيير كلمة المرور')
       return { success: false, error: error.message }
     }
   }

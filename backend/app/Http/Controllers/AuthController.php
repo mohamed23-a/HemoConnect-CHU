@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
@@ -135,24 +136,34 @@ class AuthController extends Controller
      */
     public function logout(Request $request)
     {
-        $user = $request->user();
-        
-        // تسجيل النشاط قبل حذف التوكن
-        ActivityLog::log(
-            $user->id,
-            'logout',
-            'User logged out',
-            null,
-            ['ip' => $request->ip()]
-        );
-        
-        // حذف التوكن الحالي
-        $request->user()->currentAccessToken()->delete();
+        try {
+            $user = $request->user();
+            
+            // تسجيل النشاط قبل حذف التوكن
+            ActivityLog::log(
+                $user->id,
+                'logout',
+                'User logged out',
+                null,
+                ['ip' => $request->ip()]
+            );
+            
+            // حذف التوكن الحالي بأمان
+            $token = $request->user()->currentAccessToken();
+            if ($token) {
+                $token->delete();
+            }
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Logged out successfully'
-        ]);
+            return response()->json([
+                'success' => true,
+                'message' => 'Logged out successfully'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error during logout: ' . $e->getMessage(), ['exception' => $e]);
+            return response()->json([
+                'message' => 'An error occurred during logout.'
+            ], 500);
+        }
     }
 
     /**
@@ -188,31 +199,38 @@ class AuthController extends Controller
             'new_password' => 'required|min:8|confirmed',
         ]);
 
-        $user = $request->user();
+        try {
+            $user = $request->user();
 
-        // التحقق من كلمة المرور الحالية
-        if (!Hash::check($request->current_password, $user->password)) {
+            // التحقق من كلمة المرور الحالية
+            if (!Hash::check($request->current_password, $user->password)) {
+                return response()->json([
+                    'message' => 'Current password is incorrect'
+                ], 400);
+            }
+
+            // تحديث كلمة المرور
+            $user->password = Hash::make($request->new_password);
+            $user->save();
+
+            // تسجيل النشاط
+            ActivityLog::log(
+                $user->id,
+                'password_changed',
+                'User changed password',
+                null,
+                ['ip' => $request->ip()]
+            );
+
             return response()->json([
-                'message' => 'Current password is incorrect'
-            ], 400);
+                'success' => true,
+                'message' => 'Password changed successfully'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error changing password: ' . $e->getMessage(), ['exception' => $e]);
+            return response()->json([
+                'message' => 'An error occurred while changing password.'
+            ], 500);
         }
-
-        // تحديث كلمة المرور
-        $user->password = Hash::make($request->new_password);
-        $user->save();
-
-        // تسجيل النشاط
-        ActivityLog::log(
-            $user->id,
-            'password_changed',
-            'User changed password',
-            null,
-            ['ip' => $request->ip()]
-        );
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Password changed successfully'
-        ]);
     }
 }
